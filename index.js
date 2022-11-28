@@ -30,6 +30,13 @@ const run = async () => {
             res.send(categories)
         })
 
+        app.post('/product', async (req, res) => {
+            const user = req.body;
+            const result = await productsCollection.insertOne(user);
+            res.send(result)
+
+        })
+
         app.get('/category/:id', async(req, res) => {
             const id = req.params.id;
             console.log(id)
@@ -49,7 +56,7 @@ const run = async () => {
         })
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email)
+         
             const query = {email};
             const result = await userCullection.findOne(query)
             res.send(result)
