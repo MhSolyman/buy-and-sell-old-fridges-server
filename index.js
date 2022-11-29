@@ -38,17 +38,17 @@ const run = async () => {
             console.log(name)
             const result = await productsCollection.insertOne(user);
             res.send(result)
-            
-            
+
+
             const categories = await categoriesCollection.findOne(query)
             console.log(categories)
             if (categories === null) {
                 const categoriesTwo = await categoriesCollection.insertOne(query);
-              console.log("nai")
+                console.log("nai")
 
-            } else{
+            } else {
                 console.log('asa')
-                
+
             }
 
         })
@@ -71,10 +71,11 @@ const run = async () => {
             res.send(result)
 
         })
-        app.get('/users/:id', async (req, res) => {
-            const id = req.params.id;
-            const query ={_id:ObjectId(id)}
-            const result = await userCullection.findOne(query);
+        app.get('/products/:email', async (req, res) => {
+            const email = req.params.email;
+            console.log(email)
+            const query = { email }
+            const result = await productsCollection.find(query).toArray();
             res.send(result)
 
         })
@@ -85,7 +86,18 @@ const run = async () => {
             const result = await userCullection.findOne(query)
             res.send(result)
         })
-
+        app.get('/seller', async (req, res) => {
+            const query = { userType:"seller"};
+            const result = await userCullection.find(query).toArray()
+           console.log(result)
+            res.send(result)
+        })
+        app.get('/buyer', async (req, res) => {
+            const query = { userType:"buyer"};
+            const result = await userCullection.find(query).toArray()
+           console.log(result)
+            res.send(result)
+        })
 
     }
     finally {
