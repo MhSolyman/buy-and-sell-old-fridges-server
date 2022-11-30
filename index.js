@@ -153,11 +153,21 @@ const run = async () => {
         })
 
 
-app.get('/allproduct',async(req,res)=>{
-   const query = {advatize:'advatize'};
-   const result = await productsCollection.find(query).toArray()
-   res.send(result)
-})
+        app.get('/allproduct', async (req, res) => {
+            const query = { advatize: 'advatize' };
+            const result = await productsCollection.find(query).toArray()
+            res.send(result)
+        })
+
+
+        app.delete('/DeleteMyprodut/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            console.log(id)
+            const result = await productsCollection.deleteOne(query);
+            res.send(result)
+
+        })
 
 
     }
