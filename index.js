@@ -138,9 +138,26 @@ const run = async () => {
             res.send(result)
         })
         //
+        app.put('/advatize/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    advatize: 'advatize'
+                }
+            }
+            const result = await productsCollection.updateOne(filter, updatedDoc, options)
+            res.send(result)
+
+        })
 
 
-
+app.get('/allproduct',async(req,res)=>{
+   const query = {advatize:'advatize'};
+   const result = await productsCollection.find(query).toArray()
+   res.send(result)
+})
 
 
     }
