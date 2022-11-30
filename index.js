@@ -35,13 +35,13 @@ const run = async () => {
             const user = req.body;
             const name = user.name;
             const query = { name: name }
-            console.log(name)
+
             const result = await productsCollection.insertOne(user);
             res.send(result)
 
 
             const categories = await categoriesCollection.findOne(query)
-            console.log(categories)
+
             if (categories === null) {
                 const categoriesTwo = await categoriesCollection.insertOne(query);
                 console.log("nai")
@@ -67,13 +67,22 @@ const run = async () => {
 
         app.post('/users', async (req, res) => {
             const user = req.body;
-            const result = await userCullection.insertOne(user);
-            res.send(result)
+            const email = user.email
+            const query = { email: email }
+            const find = await userCullection.findOne(query);
+            console.log(find)
+            if (find === null) {
+                const dataInsert = await userCullection.insertOne(user);
+                res.send(dataInsert)
+
+            }
+
+
 
         })
         app.get('/products/:email', async (req, res) => {
             const email = req.params.email;
-            console.log(email)
+
             const query = { email }
             const result = await productsCollection.find(query).toArray();
             res.send(result)
@@ -86,18 +95,53 @@ const run = async () => {
             const result = await userCullection.findOne(query)
             res.send(result)
         })
-        app.get('/seller', async (req, res) => {
-            const query = { userType:"seller"};
+        app.get('/sellers', async (req, res) => {
+            const query = { userType: "seller" };
             const result = await userCullection.find(query).toArray()
-           console.log(result)
+
             res.send(result)
         })
-        app.get('/buyer', async (req, res) => {
-            const query = { userType:"buyer"};
+        app.get('/buyers', async (req, res) => {
+            const query = { userType: "buyer" };
             const result = await userCullection.find(query).toArray()
-           console.log(result)
+            console.log(result)
             res.send(result)
         })
+
+        //veryfy api make
+        app.put('/veryfy/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    veryfy: 'veryfy'
+                }
+            }
+            const result = await userCullection.updateOne(filter, updatedDoc, options)
+            res.send(result)
+
+        })
+
+        app.delete('/Deleteuser/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await userCullection.deleteOne(query);
+            res.send(result)
+
+        })
+        // one pproduct get
+        app.get('/oneproduct/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await productsCollection.findOne(query);
+            res.send(result)
+        })
+        //
+
+
+
+
 
     }
     finally {
