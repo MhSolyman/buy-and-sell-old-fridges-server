@@ -261,7 +261,7 @@ const run = async () => {
         app.get('/report',async(req,res)=>{
            const query ={report:'report'}
            const result = await userCullection.find(query).toArray()
-           res.send(result)
+           res.send(result);
         })
 
 
