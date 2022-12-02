@@ -1,4 +1,5 @@
 const express = require('express');
+var jwt = require('jsonwebtoken');
 const app = express()
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -26,6 +27,28 @@ const run = async () => {
         const categoriesCollection = client.db('categories').collection('category')
         const productsCollection = client.db('categories').collection('products')
         const userCullection = client.db('users').collection('user')
+
+
+
+        const verfyjwt = (req, res, next) => {
+            const authHeader = req.headers.authorization;
+
+            if (!authHeader) {
+                res.send(401).send({ message: 'un AUth accsses' })
+            }
+            const token = authHeader.split(' ')[1];
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+                if (err) {
+                    return res.status(401).send({ message: "un AUth accsses" });
+                }
+                req.decoded = decoded;
+                next()
+            })
+
+        }
+
+
+
         app.get('/categories', async (req, res) => {
             const query = {};
             const categories = await categoriesCollection.find(query).toArray()
@@ -102,8 +125,9 @@ const run = async () => {
 
             res.send(result)
         })
-        app.get('/buyers', async (req, res) => {
+        app.get('/buyers', verfyjwt, async (req, res) => {
             const query = { userType: "buyer" };
+          
             const result = await userCullection.find(query).toArray()
             console.log(result)
             res.send(result)
@@ -168,6 +192,76 @@ const run = async () => {
             const result = await productsCollection.deleteOne(query);
             res.send(result)
 
+        })
+
+
+
+        app.put('/book/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const booked = req.body
+            console.log(booked.Blocation)
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    Bemail: booked.Bemail,
+                    Blocation: booked.Blocation,
+                    productName: booked.productName,
+                    book: 'book'
+                }
+            }
+            const result = await productsCollection.updateOne(filter, updatedDoc, options)
+            res.send(result)
+
+        })
+        app.get('/book/:Bemail', verfyjwt, async (req, res) => {
+            const Bemail = req.params.Bemail
+            const decodedEmail = req.decoded.email;
+            if(Bemail !== decodedEmail){
+                return res.send(403).send({message:'faizlami koiran na'})
+            }
+
+            const query = { Bemail }
+            const result = await productsCollection.find(query).toArray()
+
+
+            res.send(result)
+        })
+
+
+
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const user = await userCullection.findOne(query)
+
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+                return res.send({ accessToken: token })
+            }
+            console.log(user)
+            res.status(403).send({ accessToken: '' })
+
+        })
+
+
+        app.put('/report/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    report: 'report'
+                }
+            }
+            const result = await userCullection.updateOne(filter, updatedDoc, options)
+            res.send(result)
+
+        })
+        app.get('/report',async(req,res)=>{
+           const query ={report:'report'}
+           const result = await userCullection.find(query).toArray()
+           res.send(result)
         })
 
 
