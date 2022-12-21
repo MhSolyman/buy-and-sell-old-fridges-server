@@ -254,13 +254,13 @@ const run = async () => {
                     report: 'report'
                 }
             }
-            const result = await userCullection.updateOne(filter, updatedDoc, options)
+            const result = await productsCollection.updateOne(filter, updatedDoc, options)
             res.send(result)
 
         })
         app.get('/report',async(req,res)=>{
            const query ={report:'report'}
-           const result = await userCullection.find(query).toArray()
+           const result = await productsCollection.find(query).toArray()
            res.send(result);
         })
 
